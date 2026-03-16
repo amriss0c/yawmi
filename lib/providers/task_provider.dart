@@ -65,19 +65,11 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> setArabicMode(bool val) async {
-    _arabicMode = val;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('arabic_mode', val);
-    notifyListeners();
-  }
-
   String _dateKey(DateTime date) {
     return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
   }
 
   DayTask? getTask(DateTime date) => _monthTasks[_dateKey(date)];
-
   DayTask? get selectedDayTask => getTask(_selectedDate);
 
   Future<void> updateTask(DateTime date, String text, int status) async {

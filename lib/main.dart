@@ -30,10 +30,7 @@ class YawmiApp extends StatelessWidget {
           theme: ThemeData(
             useMaterial3: true,
             brightness: Brightness.light,
-            colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color(0xFF1A6B4A),
-              primary: const Color(0xFF1A6B4A),
-            ),
+            colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1A6B4A)),
           ),
           darkTheme: ThemeData(
             useMaterial3: true,
@@ -42,7 +39,6 @@ class YawmiApp extends StatelessWidget {
               seedColor: const Color(0xFF1A6B4A),
               brightness: Brightness.dark,
             ),
-            // FIX: Using CardThemeData instead of CardTheme
             cardTheme: const CardThemeData(color: Color(0xFF1E1E1E)),
           ),
           home: const CalendarScreen(),

@@ -1,17 +1,42 @@
 class DayTask {
-  final String date;     // Format: YYYY-MM-DD
+  final String date;
   final String taskText;
-  final int status;      // 0 = Not Done, 1 = Done
+  final int status;
+  final String updatedAt;
 
-  DayTask({required this.date, required this.taskText, required this.status});
+  DayTask({
+    required this.date,
+    required this.taskText,
+    required this.status,
+    String? updatedAt,
+  }) : updatedAt = updatedAt ?? DateTime.now().toUtc().toIso8601String();
 
-  Map<String, dynamic> toMap() => {'date': date, 'taskText': taskText, 'status': status};
+  Map<String, dynamic> toMap() => {
+    'date': date,
+    'taskText': taskText,
+    'status': status,
+    'updatedAt': updatedAt,
+  };
 
-  factory DayTask.fromMap(Map<String, dynamic> map) {
-    return DayTask(
-      date: map['date'] as String? ?? '',
-      taskText: map['taskText'] as String? ?? '',
-      status: map['status'] as int? ?? 0,
-    );
+  Map<String, dynamic> toSupabaseMap() => {
+    'date': date,
+    'task_text': taskText,
+    'status': status,
+    'updated_at': updatedAt,
+  };
+
+  factory DayTask.fromMap(Map<String, dynamic> map) => DayTask(
+    date: map['date']?.toString() ?? '',
+    taskText: map['taskText']?.toString() ?? map['task_text']?.toString() ?? '',
+    status: map['status'] is int ? map['status'] : int.tryParse(map['status'].toString()) ?? 0,
+    updatedAt: map['updatedAt']?.toString() ?? map['updated_at']?.toString(),
+  );
+
+  bool isNewerThan(DayTask other) {
+    try {
+      return DateTime.parse(updatedAt).isAfter(DateTime.parse(other.updatedAt));
+    } catch (_) {
+      return true;
+    }
   }
 }
