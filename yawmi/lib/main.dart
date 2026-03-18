@@ -11,6 +11,8 @@ void main() {
   // This allows the UI to render immediately, eliminating the white screen crash.
   // The provider handles its own internal _isLoading state.
   taskProvider.init();
+    await NotificationService.init(); 
+    await NotificationService.instance.checkTodayTaskAndNotify();
 
   runApp(
     ChangeNotifierProvider.value(
