@@ -3,21 +3,25 @@ import 'package:provider/provider.dart';
 import 'providers/task_provider.dart';
 import 'screens/calendar_screen.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
   final taskProvider = TaskProvider();
-  await taskProvider.init();
+  
+  // CRITICAL FIX: The 'await' has been removed. 
+  // This allows the UI to render immediately, eliminating the white screen crash.
+  // The provider handles its own internal _isLoading state.
+  taskProvider.init();
 
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => taskProvider,
-      child: const YawmiApp(),
+    ChangeNotifierProvider.value(
+      value: taskProvider,
+      child: const WirdiApp(),
     ),
   );
 }
 
-class YawmiApp extends StatelessWidget {
-  const YawmiApp({super.key});
+class WirdiApp extends StatelessWidget {
+  const WirdiApp({super.key});
 
   @override
   Widget build(BuildContext context) {

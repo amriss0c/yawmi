@@ -129,7 +129,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           onPressed: () async {
                             await QuotesService.instance
                                 .saveApiKey(_geminiKeyController.text);
-                            QuotesService.instance.fetchQuote(() {});
+                            QuotesService.instance.fetchQuote();
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(

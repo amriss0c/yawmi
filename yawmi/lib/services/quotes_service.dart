@@ -3,7 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-class QuotesService {
+// 1. CRITICAL FIX: Service must extend ChangeNotifier to update the UI
+class QuotesService extends ChangeNotifier {
   static final QuotesService instance = QuotesService._();
   QuotesService._();
 
@@ -34,10 +35,12 @@ class QuotesService {
   List<String> _enabledCategories = List.from(defaultCategories);
   String _quoteArabic = '';
   String _quoteAuthor = '';
+  String _quoteError = '';
   bool _isLoading = false;
 
   String get quoteArabic => _quoteArabic;
   String get quoteAuthor => _quoteAuthor;
+  String get quoteError => _quoteError;
   bool get isLoading => _isLoading;
   bool get isConfigured => _apiKey.isNotEmpty;
   List<String> get enabledCategories => _enabledCategories;
@@ -55,12 +58,14 @@ class QuotesService {
     _apiKey = key.trim();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('gemini_api_key', _apiKey);
+    notifyListeners();
   }
 
   Future<void> saveCategories(List<String> cats) async {
     _enabledCategories = cats;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList('quote_categories', cats);
+    notifyListeners();
   }
 
   String _pickCategory() {
@@ -71,24 +76,23 @@ class QuotesService {
     return _enabledCategories[dayOfYear % _enabledCategories.length];
   }
 
-  Future<void> fetchQuote(Function() onUpdate) async {
-    // TEMP: hardcoded for testing — remove after confirming flow works
-    if (_apiKey.isEmpty) _apiKey = 'AIzaSyDlRudZIVhQzBp1GdWvpU3yGoc5JhpnES8';
-    debugPrint('fetchQuote called. Key empty: \${_apiKey.isEmpty}. Key length: \${_apiKey.length}');
+  // 2. CRITICAL FIX: Removed the callback parameter. We use notifyListeners() now.
+  Future<void> fetchQuote() async {
+    await loadConfig(); 
+    
     if (_apiKey.isEmpty) {
-      debugPrint('fetchQuote: no API key — skipping');
       _isLoading = false;
-      onUpdate();
+      notifyListeners();
       return;
     }
+    
     _isLoading = true;
-    onUpdate();
+    notifyListeners(); // Tells UI to show spinner
 
     try {
       final category = _pickCategory();
       final categoryEn = categoryTags[category] ?? 'wisdom';
 
-      // Check daily cache — one new quote per day per category
       final today = DateTime.now();
       final cacheKey = 'quote_${today.year}_${today.month}_${today.day}_$category';
       final prefs = await SharedPreferences.getInstance();
@@ -99,11 +103,10 @@ class QuotesService {
         _quoteArabic = cachedAr;
         _quoteAuthor = cachedAuthor;
         _isLoading = false;
-        onUpdate();
+        notifyListeners(); // Tells UI to show cached quote
         return;
       }
 
-      // Build prompt — ask Gemini for quote directly in Arabic
       final prompt = '''أعطني اقتباساً واحداً قوياً ومؤثراً باللغة العربية الفصحى من شخصية عالمية مشهورة ومحترمة في مجال: $categoryEn
 
 الشروط:
@@ -134,8 +137,6 @@ class QuotesService {
         }),
       ).timeout(const Duration(seconds: 30));
 
-      debugPrint('Gemini response: \${response.statusCode}');
-      debugPrint('Gemini body: \${response.body.substring(0, response.body.length > 200 ? 200 : response.body.length)}');
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final text = data['candidates']?[0]?['content']?['parts']?[0]?['text']
@@ -158,22 +159,21 @@ class QuotesService {
             _quoteAuthor = '';
           }
 
-          // Cache today's quote
           await prefs.setString('${cacheKey}_ar', _quoteArabic);
           await prefs.setString('${cacheKey}_author', _quoteAuthor);
           await prefs.setString('cached_quote_ar', _quoteArabic);
           await prefs.setString('cached_quote_author', _quoteAuthor);
-
-          debugPrint('Quote fetched: $_quoteArabic — $_quoteAuthor');
         }
       } else {
+        _quoteError = 'HTTP ${response.statusCode}';
         debugPrint('Gemini API error: ${response.statusCode} ${response.body}');
       }
     } catch (e) {
+      _quoteError = 'Connection Error';
       debugPrint('fetchQuote error: $e');
     }
 
     _isLoading = false;
-    onUpdate();
+    notifyListeners(); // Tells UI API call is complete
   }
 }

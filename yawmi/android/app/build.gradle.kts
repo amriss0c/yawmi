@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.yawmi"
+    namespace = "com.wirdi.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -20,7 +20,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.yawmi"
+        applicationId = "com.wirdi.app"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

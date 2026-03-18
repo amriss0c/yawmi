@@ -1,4 +1,4 @@
-name: yawmi
+name: wirdi
 description: Daily task tracker with Gregorian and Hijri calendar.
 publish_to: 'none'
 version: 1.0.0+1

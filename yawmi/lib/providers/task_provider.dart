@@ -57,6 +57,11 @@ class TaskProvider extends ChangeNotifier {
   SyncStatus get syncStatus => _syncStatus;
   DateTime? get lastSyncTime => _lastSyncTime;
   String? get signedInUser => _signedInUser;
+  String get quoteArabic => QuotesService.instance.quoteArabic;
+  String get quoteAuthor => QuotesService.instance.quoteAuthor;
+  bool get quoteLoading => QuotesService.instance.isLoading;
+  bool get quoteConfigured => QuotesService.instance.isConfigured;
+  String get quoteError => QuotesService.instance.quoteError;
 
   Future<void> init() async {
     _isLoading = true;
@@ -96,6 +101,9 @@ class TaskProvider extends ChangeNotifier {
 
     _isLoading = false;
     notifyListeners();
+
+    // Fetch daily quote
+    QuotesService.instance.fetchQuote();
 
     if (OneDriveService.instance.isSignedIn) {
       _syncInBackground();
