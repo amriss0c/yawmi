@@ -17,6 +17,13 @@ class TaskProvider extends ChangeNotifier {
   DateTime get selectedDate => _selectedDate;
   bool get startOnSaturday => _startOnSaturday;
   bool get arabicMode => _arabicMode;
+
+  Future<void> setArabicMode(bool value) async {
+    _arabicMode = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('arabic_mode', value);
+    notifyListeners();
+  }
   bool get isDarkMode => _isDarkMode;
   bool get isLoading => _isLoading;
 

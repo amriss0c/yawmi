@@ -1,5 +1,6 @@
+import 'package:wirdi/services/gemini_service.dart';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz_data;
 import '../db/database_helper.dart';
 
@@ -10,7 +11,7 @@ class NotificationService {
     tz_data.initializeTimeZones();
     const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
     const initSettings = InitializationSettings(android: androidInit);
-    await _notifications.initialize(initSettings);
+    await _notifications.initialize(settings: initSettings);
   }
 
   /// Targets ONLY today's date.
@@ -30,7 +31,7 @@ class NotificationService {
       await _showNotification(
         id: 777, // Unique ID for today's reminder
         title: "مهمة اليوم لم تكتمل",
-        body: "تذكير: ${task.taskText}",
+        body: await GeminiService.getDailyQuote(),
       );
     }
   }
@@ -49,6 +50,6 @@ class NotificationService {
         showWhen: true,
       ),
     );
-    await _notifications.show(id, title, body, details);
+    await _notifications.show(id: id, title: title, body: body, notificationDetails: details);
   }
 }

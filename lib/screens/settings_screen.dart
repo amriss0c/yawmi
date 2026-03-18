@@ -37,7 +37,7 @@ class SettingsScreen extends StatelessWidget {
                     color: const Color(0xFF1A6B4A),
                   ),
                   value: provider.isDarkMode,
-                  activeColor: const Color(0xFF1A6B4A),
+                  activeThumbColor: const Color(0xFF1A6B4A),
                   onChanged: (v) => provider.toggleDarkMode(v),
                 ),
 
@@ -59,13 +59,13 @@ class SettingsScreen extends StatelessWidget {
                 SwitchListTile(
                   title: const Text('بداية الأسبوع يوم السبت'),
                   value: provider.startOnSaturday,
-                  activeColor: const Color(0xFF1A6B4A),
+                  activeThumbColor: const Color(0xFF1A6B4A),
                   onChanged: (v) => provider.setStartOnSaturday(v),
                 ),
                 SwitchListTile(
                   title: const Text('اللغة العربية'),
                   value: provider.arabicMode,
-                  activeColor: const Color(0xFF1A6B4A),
+                  activeThumbColor: const Color(0xFF1A6B4A),
                   onChanged: (v) => provider.setArabicMode(v),
                 ),
                 
